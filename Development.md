@@ -280,3 +280,15 @@ This generally uses a specific version number (e.g. 20160323164322) that has bee
 ## Gotchas
 
 We compile some templates into `.go` files using `go-bindata`. If you make any changes to template files you will often need to run `make templates` to propagate your changes to the `.go` files. If it seems like your template changes aren't doing anything, try running `make templates.
+
+### Rack API changes: Running a local Rack
+
+On Rack API changes, you need to run a local Rack:
+
+- Update `.env` so it's pointing at your AWS resources for your dev rack
+- `convox start`
+- `convox login localhost`
+
+You should see things happening in the `convox start` logs when you run `convox` commands.
+
+(Setting envvar `RACK=dev` might have something to do with verbosity but might control other things too. More research needed.)
