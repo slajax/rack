@@ -6,6 +6,14 @@ Convox Rack is open source PaaS built on top of expert infrastructure automation
 
 Rack gives you a simple developer-focused API that lets you build, deploy, scale and manage apps on private infrastructure with ease.
 
+## Getting Started
+
+The easiest way to get started with the platform is to [sign up for an account](https://convox.com/signup) and follow the interactive setup. This walks you through the steps to connect your AWS account, install Rack, setup the `convox` CLI on your computer and deploy your first app.
+
+Read the full [Convox Documentation](https://convox.com/docs) for more details.
+
+## Architecture
+
 ### Private and Secure
 
 Rack runs in an isolated VPC that only you and your team have access to. Application builds take place in a single-tenant build service, and the resulting Docker images are stored in a private ECS Container Registry. Application secrets are stored in S3, encrypted with KMS, a hardware security module. Application logs are archived in CloudWatch LogsGroups.
@@ -40,7 +48,7 @@ Some updates are infrastructure migrations. For example, ECR is still in limited
 
 Rack is open source and free (as in beer and in speech) to use. You can look at the source code to audit how it configures your AWS account. You fork it and modify. You can contribute your ideas and patches back to the project so we can all share.
 
-### Philosophy
+## Philosophy
 
 The Convox team and the Rack project have a strong philosophy about how to manage cloud services. Some choices we frequently consider:
 
@@ -51,9 +59,9 @@ The Convox team and the Rack project have a strong philosophy about how to manag
 * Shared Expertise vs Bespoke
 * Porcelain over Plumbing
 
-## Installation Quick Start
+## CLI Installation Quick Start
 
-You need an AWS account and access credentials, the Convox CLI, and 10 minutes.
+If you don't want to [sign up for an account](https://convox.com/signup), you can install Rack through the CLI. You'll need an AWS access key, the CLI, and 10 minutes.
 
 ```
 # Create and pass AWS access keys to the installer. These should be temporary keys and can be deleted after the install.
