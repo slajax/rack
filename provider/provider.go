@@ -72,7 +72,8 @@ type Provider interface {
 	ReleaseDelete(app, buildID string) error
 	ReleaseGet(app, id string) (*structs.Release, error)
 	ReleaseList(app string, limit int64) (structs.Releases, error)
-	ReleasePromote(*structs.Release) error
+	ReleasePromote(app, id string) (*structs.Release, error)
+	ReleaseEvents(w io.Writer, app, id string) error
 	ReleaseSave(*structs.Release) error
 
 	ResourceCreate(name, kind string, params map[string]string) (*structs.Resource, error)

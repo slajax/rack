@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"gopkg.in/urfave/cli.v1"
@@ -47,6 +48,16 @@ func init() {
 						EnvVar: "CONVOX_WAIT",
 						Usage:  "wait for release to finish promoting before returning",
 					},
+				},
+			},
+			{
+				Name:        "events",
+				Description: "stream release events",
+				Usage:       "<release id>",
+				Action:      cmdReleaseEvents,
+				Flags: []cli.Flag{
+					appFlag,
+					rackFlag,
 				},
 			},
 		},
@@ -167,6 +178,21 @@ func cmdReleasePromote(c *cli.Context) error {
 		fmt.Println("OK")
 	}
 
+	return nil
+}
+
+func cmdReleaseEvents(c *cli.Context) error {
+	_, app, err := stdcli.DirApp(c, ".")
+	if err != nil {
+		return stdcli.Error(err)
+	}
+
+	release := c.Args()[0]
+
+	err = rackClient(c).StreamReleaseEvents(app, release, os.Stdout)
+	if err != nil {
+		return stdcli.Error(err)
+	}
 	return nil
 }
 

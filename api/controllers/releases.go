@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/net/websocket"
+
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/convox/rack/api/httperr"
 	"github.com/convox/rack/api/models"
@@ -139,4 +141,21 @@ func ForkRelease(app *structs.App) (*structs.Release, error) {
 		Manifest: release.Manifest,
 		Created:  release.Created,
 	}, nil
+}
+
+// ReleaseEvents streams stack update events until a promotion is finished
+func ReleaseEvents(ws *websocket.Conn) *httperr.Error {
+	app := mux.Vars(ws.Request())["app"]
+	release := mux.Vars(ws.Request())["release"]
+
+	var err error
+
+	err = models.Provider().ReleaseEvents(ws, app, release)
+	if err != nil {
+		if strings.HasSuffix(err.Error(), "write: broken pipe") {
+			return nil
+		}
+		return httperr.Server(err)
+	}
+	return nil
 }

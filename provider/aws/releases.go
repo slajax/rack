@@ -3,9 +3,11 @@ package aws
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/convox/rack/api/crypt"
@@ -257,4 +259,98 @@ func (p *AWSProvider) deleteReleaseItems(qi *dynamodb.QueryInput, tableName stri
 	}
 
 	return p.dynamoBatchDeleteItems(wrs, tableName)
+}
+
+// ReleaseEvents streams the events for a Build to an io.Writer
+func (p *AWSProvider) ReleaseEvents(w io.Writer, app, id string) error {
+	log := Logger.At("ReleaseLogs").Namespace("app=%q id=%q", app, id).Start()
+
+	a, err := p.AppGet(app)
+	if err != nil {
+		fmt.Println("here")
+		fmt.Println(err.Error())
+		return err
+	}
+
+	fmt.Printf("APP: %#v\n", a)
+
+	res, err := p.cloudformation().DescribeStackEvents(&cloudformation.DescribeStackEventsInput{
+		StackName: aws.String(a.StackName()),
+	})
+
+	for _, event := range res.StackEvents {
+		_, err := w.Write([]byte(fmt.Sprintf("%s: %s\n", *event.ResourceType, *event.ResourceStatus)))
+		if err != nil {
+			fmt.Println("BREAKING DAWG")
+			break
+		}
+	}
+
+	// switch b.Status {
+	// case "running":
+	// 	task, err := p.describeTask(b.Tags["task"])
+	// 	if err != nil {
+	// 		return err
+	// 	}
+
+	// 	ci, err := p.containerInstance(*task.ContainerInstanceArn)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+
+	// 	dc, err := p.dockerInstance(*ci.Ec2InstanceId)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+
+	// 	cs, err := dc.ListContainers(docker.ListContainersOptions{
+	// 		All: true,
+	// 		Filters: map[string][]string{
+	// 			"label": {fmt.Sprintf("com.amazonaws.ecs.task-arn=%s", *task.TaskArn)},
+	// 		},
+	// 	})
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	if len(cs) != 1 {
+	// 		return fmt.Errorf("could not find container for task: %s", *task.TaskArn)
+	// 	}
+
+	// 	err = dc.Logs(docker.LogsOptions{
+	// 		Container:         cs[0].ID,
+	// 		OutputStream:      w,
+	// 		ErrorStream:       w,
+	// 		InactivityTimeout: 20 * time.Minute,
+	// 		Follow:            true,
+	// 		Stdout:            true,
+	// 		Stderr:            true,
+	// 	})
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// default:
+	// 	u, err := url.Parse(b.Logs)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+
+	// 	switch u.Scheme {
+	// 	case "object":
+	// 		r, err := p.ObjectFetch(u.Path)
+	// 		if err != nil {
+	// 			return err
+	// 		}
+
+	// 		if _, err := io.Copy(w, r); err != nil {
+	// 			return err
+	// 		}
+	// 	default:
+	// 		if _, err := w.Write([]byte(b.Logs)); err != nil {
+	// 			return err
+	// 		}
+	// 	}
+	// }
+
+	log.Success()
+	return nil
 }

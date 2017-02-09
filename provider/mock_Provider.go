@@ -846,6 +846,20 @@ func (_m *MockProvider) ReleaseDelete(app string, buildID string) error {
 	return r0
 }
 
+// ReleaseEvents provides a mock function with given fields: w, app, id
+func (_m *MockProvider) ReleaseEvents(w io.Writer, app string, id string) error {
+	ret := _m.Called(w, app, id)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(io.Writer, string, string) error); ok {
+		r0 = rf(w, app, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // ReleaseGet provides a mock function with given fields: app, id
 func (_m *MockProvider) ReleaseGet(app string, id string) (*structs.Release, error) {
 	ret := _m.Called(app, id)
