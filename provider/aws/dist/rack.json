@@ -458,6 +458,13 @@
         "KeyUsage": "ENCRYPT_DECRYPT"
       }
     },
+    "EncryptionKeyAlias": {
+      "Type": "AWS::KMS::Alias",
+      "Properties": {
+        "AliasName": "alias/convox",
+        "TargetKeyId": { "Ref": "EncryptionKey" }
+      }
+    },
     "LogGroup": {
       "Type": "AWS::Logs::LogGroup"
     },
@@ -519,6 +526,7 @@
             "};"
           ]]}
         },
+        "Description": "Function to support Convox logs filtering",
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": { "Fn::GetAtt": [ "LogSubscriptionFilterRole", "Arn" ] },
@@ -620,6 +628,7 @@
           "S3Bucket": { "Fn::Join": [ "-", [ "convox", { "Ref": "AWS::Region" } ] ] },
           "S3Key": { "Fn::Join": [ "", [ "release/", { "Ref": "Version" }, "/lambda/formation.zip" ] ] }
         },
+        "Description": "Convox handler for custom resources",
         "Handler": "index.external",
         "MemorySize": "128",
         "Role": { "Fn::GetAtt": [ "CustomTopicRole", "Arn" ] },
@@ -965,6 +974,9 @@
       "Type": "AWS::EC2::InternetGateway",
       "Condition": "BlankExistingVpc",
       "Properties": {
+        "Tags": [
+          { "Key": "Name", "Value": { "Ref": "AWS::StackName" } }
+        ]
       }
     },
     "GatewayAttachment": {
@@ -1130,6 +1142,9 @@
       "Type": "AWS::EC2::RouteTable",
       "Condition": "NotExistingVpcAndBlankInternetGateway",
       "Properties": {
+        "Tags": [
+          { "Key": "Name", "Value": { "Ref": "AWS::StackName" } }
+        ],
         "VpcId": { "Fn::If": [ "BlankExistingVpc",
           { "Ref": "Vpc" },
           { "Ref": "ExistingVpc" }
@@ -1154,6 +1169,9 @@
       "DependsOn": [ "Nat0" ],
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
+        "Tags": [
+          { "Key": "Name", "Value": { "Ref": "AWS::StackName" } }
+        ],
         "VpcId": { "Fn::If": [ "BlankExistingVpc",
           { "Ref": "Vpc" },
           { "Ref": "ExistingVpc" }
@@ -1165,6 +1183,9 @@
       "DependsOn": [ "Nat1" ],
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
+        "Tags": [
+          { "Key": "Name", "Value": { "Ref": "AWS::StackName" } }
+        ],
         "VpcId": { "Fn::If": [ "BlankExistingVpc",
           { "Ref": "Vpc" },
           { "Ref": "ExistingVpc" }
@@ -1176,6 +1197,9 @@
       "DependsOn": [ "Nat2" ],
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
+        "Tags": [
+          { "Key": "Name", "Value": { "Ref": "AWS::StackName" } }
+        ],
         "VpcId": { "Fn::If": [ "BlankExistingVpc",
           { "Ref": "Vpc" },
           { "Ref": "ExistingVpc" }
@@ -1273,6 +1297,9 @@
         "SecurityGroupIngress": [
           { "IpProtocol": "tcp", "FromPort": "0", "ToPort": "65535", "CidrIp": { "Ref": "VPCCIDR" } },
           { "IpProtocol": "udp", "FromPort": "0", "ToPort": "65535", "CidrIp": { "Ref": "VPCCIDR" } }
+        ],
+        "Tags": [
+          { "Key": "Name", "Value": { "Ref": "AWS::StackName" } }
         ],
         "VpcId": { "Fn::If": [ "BlankExistingVpc",
           { "Ref": "Vpc" },
@@ -1810,6 +1837,10 @@
           {
             "Key": "GatewayAttachment",
             "Value": { "Fn::If": [ "ExistingVpc", "existing", { "Ref": "GatewayAttachment" } ] }
+          },
+          {
+            "Key": "Name",
+            "Value": { "Ref": "AWS::StackName" }
           }
         ]
       },
@@ -1853,6 +1884,9 @@
             "FromPort": "443",
             "ToPort": "443"
           }
+        ],
+        "Tags": [
+          { "Key": "Name", "Value": { "Ref": "AWS::StackName" } }
         ],
         "VpcId": { "Fn::If": [ "BlankExistingVpc",
           { "Ref": "Vpc" },
@@ -1994,6 +2028,9 @@
         "SecurityGroupIngress": [
           { "IpProtocol": "tcp", "FromPort": "2049", "ToPort": "2049", "CidrIp": { "Ref": "VPCCIDR" } }
         ],
+        "Tags": [
+          { "Key": "Name", "Value": { "Ref": "AWS::StackName" } }
+        ],
         "VpcId": { "Fn::If": [ "BlankExistingVpc",
           { "Ref": "Vpc" },
           { "Ref": "ExistingVpc" }
@@ -2061,6 +2098,10 @@
             "Value": {
               "Ref": "AWS::StackName"
             }
+          },
+          {
+            "Key": "Name",
+            "Value": { "Ref": "AWS::StackName" }
           }
         ]
       },
