@@ -775,6 +775,8 @@
                       "kms:Decrypt",
                       "kms:GenerateDataKey",
                       "kms:GenerateRandom",
+                      "kms:CreateAlias",
+                      "kms:ListAliases",
                       "lambda:CreateFunction",
                       "logs:CreateLogGroup",
                       "logs:DeleteLogGroup",
