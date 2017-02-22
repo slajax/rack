@@ -774,6 +774,7 @@
                       "iam:PassRole",
                       "iam:UploadServerCertificate",
                       "kms:Decrypt",
+                      "kms:DeleteAlias",
                       "kms:GenerateDataKey",
                       "kms:GenerateRandom",
                       "kms:CreateAlias",
