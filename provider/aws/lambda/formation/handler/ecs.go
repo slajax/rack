@@ -286,6 +286,25 @@ func ECSTaskDefinitionCreate(req Request) (string, map[string]string, error) {
 				}
 			}
 		}
+
+		// set log configuration
+		if logConfig, ok := task["LogConfiguration"].(map[string]interface{}); ok {
+			c := &ecs.LogConfiguration{
+				Options: map[string]*string{},
+			}
+
+			if d, ok := logConfig["LogDriver"].(string); ok && d != "" {
+				c.LogDriver = aws.String(d)
+			}
+
+			if opts, ok := logConfig["Options"].(map[string]string); ok && opts != nil {
+				for k, v := range opts {
+					c.Options[k] = aws.String(v)
+				}
+			}
+
+			r.ContainerDefinitions[i].LogConfiguration = c
+		}
 	}
 
 	res, err := ECS(req).RegisterTaskDefinition(r)
