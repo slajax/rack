@@ -243,7 +243,6 @@
                 {{ range $key, $value := .LinkVars }}
                   "{{ $key }}": {{ $value }},
                 {{ end }}
-                "LOG_GROUP": { "Ref": "LogGroup" },
                 "PROCESS": "{{ $e.Name }}"
               },
               "Volumes": [
