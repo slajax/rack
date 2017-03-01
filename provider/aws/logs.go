@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -116,10 +117,21 @@ func (p *AWSProvider) writeLogEvents(w io.Writer, events []*cloudwatchlogs.Filte
 			latest = *e.Timestamp
 		}
 
+		prefix := ""
+
+		// turn log stream with name `prefix-name/container-name/ecs-task-id`
+		// into a log line prefix like `web:RRQSKTNDULA/0b4127231289`
+		if strings.HasPrefix(*e.LogStreamName, "convox/") {
+			parts := strings.Split(*e.LogStreamName, "/")
+			if len(parts) == 3 {
+				prefix = fmt.Sprintf("%s:%s/%s", parts[1], "RUNKNOWN", parts[2][0:12]) // FIXME: translate task id to release id somehow
+			}
+		}
+
 		sec := *e.Timestamp / 1000
 		nsec := *e.Timestamp - (sec * 1000)
 		t := time.Unix(sec, nsec).UTC()
-		line := fmt.Sprintf("%s %s\n", t.Format(time.RFC3339), *e.Message)
+		line := fmt.Sprintf("%s %s%s\n", t.Format(time.RFC3339), prefix, *e.Message)
 
 		if _, err := w.Write([]byte(line)); err != nil {
 			log.Error(err)
