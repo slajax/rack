@@ -288,7 +288,10 @@ func ECSTaskDefinitionCreate(req Request) (string, map[string]string, error) {
 		}
 
 		// set log configuration
+		// LogConfiguration:map[Options:map[awslogs-stream-prefix:convox awslogs-group:dev-ice-api-LogGroup-76DD24TF8Z1 awslogs-region:us-east-1] LogDriver:awslogs
 		if logConfig, ok := task["LogConfiguration"].(map[string]interface{}); ok {
+			fmt.Printf("OK logConfig: %+v\n", logConfig)
+
 			c := &ecs.LogConfiguration{
 				Options: map[string]*string{},
 			}
@@ -298,10 +301,13 @@ func ECSTaskDefinitionCreate(req Request) (string, map[string]string, error) {
 			}
 
 			if opts, ok := logConfig["Options"].(map[string]string); ok && opts != nil {
+				fmt.Printf("OK OPTS: %+v\n", opts)
 				for k, v := range opts {
 					c.Options[k] = aws.String(v)
 				}
 			}
+
+			fmt.Printf("LOG CONFIGURATION: %+v\n", c)
 
 			r.ContainerDefinitions[i].LogConfiguration = c
 		}
